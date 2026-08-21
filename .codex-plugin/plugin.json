@@ -1,0 +1,40 @@
+{
+  "name": "explainflow",
+  "version": "0.9.0",
+  "description": "Turn any topic into structured visual explanations using mind maps, flowcharts, diagrams, infographics, cheat sheets, workflows, timelines, comparisons, and more.",
+  "author": {
+    "name": "AneFerez",
+    "url": "https://github.com/aneferez"
+  },
+  "homepage": "https://github.com/aneferez/Explainflow",
+  "repository": "https://github.com/aneferez/Explainflow",
+  "license": "MIT",
+  "keywords": [
+    "education",
+    "visual-learning",
+    "mindmap",
+    "flowchart",
+    "diagram",
+    "infographic",
+    "cheatsheet",
+    "agent-skill"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ExplainFlow",
+    "shortDescription": "Turn topics into clear visual and structured explanations",
+    "longDescription": "ExplainFlow converts topics into reusable visual and structured formats such as mind maps, flowcharts, diagrams, architecture views, infographics, cheat sheets, timelines, roadmaps, comparisons, flashcards, quizzes, and step-by-step explanations.",
+    "developerName": "AneFerez",
+    "category": "Education",
+    "capabilities": ["Interactive"],
+    "websiteURL": "https://github.com/aneferez/Explainflow",
+    "privacyPolicyURL": "https://github.com/aneferez/Explainflow/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/aneferez/Explainflow/blob/main/TERMS.md",
+    "defaultPrompt": [
+      "Create a mind map for this topic.",
+      "Turn this process into a flowchart.",
+      "Make a compact cheat sheet for this topic."
+    ],
+    "screenshots": []
+  }
+}
