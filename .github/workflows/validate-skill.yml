@@ -1,0 +1,76 @@
+name: Validate ExplainFlow Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate repository structure and command coverage
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          required = [
+              Path('SKILL.md'),
+              Path('README.md'),
+              Path('LICENSE'),
+              Path('CONTRIBUTING.md'),
+              Path('references/COMMANDS.md'),
+              Path('references/QUALITY_CHECKS.md'),
+              Path('examples/sample-prompts.md'),
+              Path('evals/cases.md'),
+              Path('evals/README.md'),
+          ]
+
+          missing = [str(p) for p in required if not p.exists()]
+          if missing:
+              print('Missing required files:', ', '.join(missing))
+              sys.exit(1)
+
+          skill = Path('SKILL.md').read_text(encoding='utf-8')
+          if not skill.startswith('---\n'):
+              print('SKILL.md must start with YAML frontmatter.')
+              sys.exit(1)
+
+          frontmatter_end = skill.find('\n---\n', 4)
+          if frontmatter_end == -1:
+              print('SKILL.md frontmatter is not closed.')
+              sys.exit(1)
+
+          frontmatter = skill[4:frontmatter_end]
+          if not re.search(r'^name:\s*explainflow\s*$', frontmatter, flags=re.M | re.I):
+              print('SKILL.md must define name: explainflow')
+              sys.exit(1)
+          if not re.search(r'^description:\s*\S.+$', frontmatter, flags=re.M):
+              print('SKILL.md must define a non-empty description.')
+              sys.exit(1)
+
+          commands_text = Path('references/COMMANDS.md').read_text(encoding='utf-8')
+          commands = []
+          for cmd in re.findall(r'`(/[-a-zA-Z0-9]+)`', commands_text):
+              if cmd not in commands:
+                  commands.append(cmd)
+
+          if len(commands) < 30:
+              print(f'Expected at least 30 documented commands; found {len(commands)}.')
+              sys.exit(1)
+
+          evals = Path('evals/cases.md').read_text(encoding='utf-8')
+          uncovered = [cmd for cmd in commands if cmd not in evals]
+          if uncovered:
+              print('Commands missing from eval coverage:', ', '.join(uncovered))
+              sys.exit(1)
+
+          print(f'Validation passed: {len(commands)} commands documented and covered by evals.')
+          PY
