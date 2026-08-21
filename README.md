@@ -1,12 +1,14 @@
 # ExplainFlow
 
-ExplainFlow is a reusable Agent Skill for turning topics into visual and highly structured explanations.
+**Public beta: `0.9.0-public-beta`**
+
+ExplainFlow is an open-source Agent Skill for turning topics into visual and highly structured explanations.
 
 ## What it does
 
 ExplainFlow routes a topic into the format best suited to learning, revision, comparison, process explanation, architecture understanding, or presentation.
 
-It currently documents **30 slash commands**, including:
+It currently documents **30 slash commands**:
 
 `/visualnotes` · `/stickynotes` · `/mindmap` · `/infographic` · `/flowchart` · `/diagram` · `/architecture` · `/timeline` · `/roadmap` · `/cheatsheet` · `/conceptmap` · `/tree` · `/pipeline` · `/workflow` · `/funnel` · `/layers` · `/flashcards` · `/comparison` · `/quiz` · `/eli10` · `/beginner` · `/expert` · `/teacher` · `/mentor` · `/stepbystep` · `/keypoints` · `/summary` · `/examples` · `/crashcourse` · `/deepdive`
 
@@ -16,12 +18,22 @@ See [`references/COMMANDS.md`](references/COMMANDS.md) for routing details.
 
 Users often know *what* they want to learn but not the best structure for learning it. ExplainFlow provides a consistent routing and quality framework so the same topic can be represented in the format best suited to the task.
 
+## Public beta
+
+ExplainFlow is now publicly available for testing from this repository under the MIT License.
+
+The current beta includes the complete skill specification, all 30 commands, quality rules, 45 behavioral evaluation cases, and static repository validation. The stable `v1.0.0` release remains gated on running the behavioral suite in a real Agent Skills-compatible runtime and resolving any blocker/high-severity failures.
+
+See [`PUBLIC_TESTING.md`](PUBLIC_TESTING.md) for the test procedure and [`releases/v0.9.0-public-beta.md`](releases/v0.9.0-public-beta.md) for beta release notes.
+
 ## Repository structure
 
 ```text
 explainflow/
 ├── SKILL.md
 ├── README.md
+├── VERSION
+├── PUBLIC_TESTING.md
 ├── CHANGELOG.md
 ├── RELEASE_CHECKLIST.md
 ├── LICENSE
@@ -34,6 +46,8 @@ explainflow/
 ├── evals/
 │   ├── README.md
 │   └── cases.md
+├── releases/
+│   └── v0.9.0-public-beta.md
 └── .github/
     └── workflows/
         └── validate-skill.yml
@@ -44,22 +58,17 @@ explainflow/
 The package follows the Agent Skills `SKILL.md` convention:
 - YAML frontmatter with `name` and `description`
 - Markdown workflow instructions
-- optional reference, example, and evaluation resources
+- supporting reference, example, and evaluation resources
+
+The canonical skill entry point is `SKILL.md`.
 
 ## Installation
 
-Installation depends on the Agent Skills-compatible environment you use.
+Use the repository folder or download a ZIP archive of the repository.
 
-Use the repository folder as the skill package and ensure the environment can read:
+In ChatGPT environments where Skill upload is available, open the Skills interface and upload the ZIP package. In other Agent Skills-compatible environments, install the repository folder according to that product's Skill installation flow.
 
-```text
-SKILL.md
-references/
-examples/
-evals/
-```
-
-The canonical skill entry point is `SKILL.md`. Do not move the reference files without updating the paths used by the skill instructions.
+After installation, try the smoke tests in [`PUBLIC_TESTING.md`](PUBLIC_TESTING.md).
 
 ## Usage
 
@@ -87,7 +96,7 @@ When commands conflict, ExplainFlow prioritizes the first command and uses later
 
 ## Evaluation
 
-ExplainFlow now includes behavioral cases for:
+ExplainFlow includes **45 behavioral cases** covering:
 - all 30 single commands
 - multi-command routing
 - conflicting-command precedence
@@ -103,15 +112,15 @@ A GitHub Actions workflow performs static validation of the repository structure
 
 ## Current status
 
-**Pre-v1.0 validation stage.**
+**Public beta — `0.9.0-public-beta`.**
 
-Core skill architecture, 30-command routing documentation, quality rules, examples, and full evaluation specifications are in place. The remaining release gate is behavioral execution of the eval suite in a real Agent Skills environment, followed by fixes, real-output examples/screenshots, and the first stable `v1.0.0` release.
+Ready for public installation/testing as an open-source Agent Skill package. Stable `v1.0.0` is pending real-runtime behavioral QA, real output examples/screenshots, and final release verification.
 
-See [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) for the exact release gate.
+See [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) for the exact stable-release gate.
 
 ## Contributing
 
-Contributions are welcome. For a command or behavior change, update the relevant reference documentation and add or modify an evaluation case.
+Contributions and beta feedback are welcome. For a command or behavior change, update the relevant reference documentation and add or modify an evaluation case.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
