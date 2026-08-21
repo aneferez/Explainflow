@@ -2,7 +2,7 @@
 
 **Public beta: `0.9.0-public-beta`**
 
-ExplainFlow is an open-source Agent Skill for turning topics into visual and highly structured explanations.
+ExplainFlow is an open-source Agent Skill and plugin package for turning topics into visual and highly structured explanations.
 
 ## What it does
 
@@ -14,65 +14,58 @@ It currently documents **30 slash commands**:
 
 See [`references/COMMANDS.md`](references/COMMANDS.md) for routing details.
 
-## Why it exists
+## Public access
 
-Users often know *what* they want to learn but not the best structure for learning it. ExplainFlow provides a consistent routing and quality framework so the same topic can be represented in the format best suited to the task.
+ExplainFlow is public under the MIT License.
 
-## Public beta
+There are now two installation surfaces:
 
-ExplainFlow is now publicly available for testing from this repository under the MIT License.
+1. **ChatGPT Skill** — download the repository ZIP and upload it from the Skills interface where Skill upload is supported. The canonical entry point is the root [`SKILL.md`](SKILL.md).
+2. **Plugin package** — the repository includes [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json) and a bundled Skill under [`skills/explainflow/`](skills/explainflow/) following OpenAI's current plugin packaging convention.
 
-The current beta includes the complete skill specification, all 30 commands, quality rules, 45 behavioral evaluation cases, and static repository validation. The stable `v1.0.0` release remains gated on running the behavioral suite in a real Agent Skills-compatible runtime and resolving any blocker/high-severity failures.
+A globally searchable Plugin Directory listing is separate from making the repository public. ExplainFlow is package-ready for that review path, but it is not considered directory-listed until OpenAI approves and publishes it.
 
-See [`PUBLIC_TESTING.md`](PUBLIC_TESTING.md) for the test procedure and [`releases/v0.9.0-public-beta.md`](releases/v0.9.0-public-beta.md) for beta release notes.
+See [`PUBLIC_DISTRIBUTION.md`](PUBLIC_DISTRIBUTION.md) for the distribution status and [`PUBLIC_TESTING.md`](PUBLIC_TESTING.md) for the beta test procedure.
 
 ## Repository structure
 
 ```text
 explainflow/
+├── .codex-plugin/
+│   └── plugin.json
+├── skills/
+│   └── explainflow/
+│       ├── SKILL.md
+│       └── references/
 ├── SKILL.md
 ├── README.md
-├── VERSION
+├── PRIVACY.md
+├── TERMS.md
+├── PUBLIC_DISTRIBUTION.md
 ├── PUBLIC_TESTING.md
+├── VERSION
 ├── CHANGELOG.md
 ├── RELEASE_CHECKLIST.md
 ├── LICENSE
 ├── CONTRIBUTING.md
 ├── references/
-│   ├── COMMANDS.md
-│   └── QUALITY_CHECKS.md
 ├── examples/
-│   └── sample-prompts.md
 ├── evals/
-│   ├── README.md
-│   └── cases.md
 ├── releases/
-│   └── v0.9.0-public-beta.md
-└── .github/
-    └── workflows/
-        └── validate-skill.yml
+└── .github/workflows/
 ```
-
-## Agent Skills compatibility
-
-The package follows the Agent Skills `SKILL.md` convention:
-- YAML frontmatter with `name` and `description`
-- Markdown workflow instructions
-- supporting reference, example, and evaluation resources
-
-The canonical skill entry point is `SKILL.md`.
 
 ## Installation
 
-Use the repository folder or download a ZIP archive of the repository.
+### ChatGPT Skill
 
-In ChatGPT environments where Skill upload is available, open the Skills interface and upload the ZIP package. In other Agent Skills-compatible environments, install the repository folder according to that product's Skill installation flow.
+Download the repository ZIP and upload it in the ChatGPT Skills interface where Skill upload is enabled.
 
-After installation, try the smoke tests in [`PUBLIC_TESTING.md`](PUBLIC_TESTING.md).
+### Plugin-capable Codex environments
+
+Use the repository as a plugin bundle. Its manifest is `.codex-plugin/plugin.json` and its Skill path is `./skills/`.
 
 ## Usage
-
-Invoke a supported format followed by a topic.
 
 ```text
 /flowchart Explain how OAuth login works.
@@ -86,8 +79,6 @@ Invoke a supported format followed by a topic.
 /architecture React frontend, FastAPI backend, PostgreSQL, Redis
 ```
 
-Commands can also be combined when compatible:
-
 ```text
 /summary /flowchart Explain JWT authentication
 ```
@@ -96,33 +87,28 @@ When commands conflict, ExplainFlow prioritizes the first command and uses later
 
 ## Evaluation
 
-ExplainFlow includes **45 behavioral cases** covering:
-- all 30 single commands
-- multi-command routing
-- conflicting-command precedence
-- missing essential inputs
-- unknown commands
-- source-grounding behavior
-- actual-image requests
-- large/complex outputs
+ExplainFlow includes **45 behavioral cases** covering all 30 commands, multi-command routing, command precedence, missing inputs, unknown commands, source-grounding behavior, image requests, and large/complex outputs.
 
 See [`evals/cases.md`](evals/cases.md) and [`evals/README.md`](evals/README.md).
-
-A GitHub Actions workflow performs static validation of the repository structure, `SKILL.md` frontmatter, documented command count, and evaluation coverage.
 
 ## Current status
 
 **Public beta — `0.9.0-public-beta`.**
 
-Ready for public installation/testing as an open-source Agent Skill package. Stable `v1.0.0` is pending real-runtime behavioral QA, real output examples/screenshots, and final release verification.
+Public source and installable package: **ready**.
 
-See [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) for the exact stable-release gate.
+Stable `v1.0.0`: pending real-runtime behavioral QA, real output examples/screenshots, and final release verification.
+
+Public Plugin Directory listing: **submission/approval pending**.
+
+## Privacy and terms
+
+- [`PRIVACY.md`](PRIVACY.md)
+- [`TERMS.md`](TERMS.md)
 
 ## Contributing
 
-Contributions and beta feedback are welcome. For a command or behavior change, update the relevant reference documentation and add or modify an evaluation case.
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Contributions and beta feedback are welcome. See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## License
 
