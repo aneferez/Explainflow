@@ -1,6 +1,6 @@
 # ExplainFlow Public Distribution
 
-ExplainFlow is designed for public use across ChatGPT Skill uploads and plugin-capable Codex environments.
+ExplainFlow is designed for public use across ChatGPT Skill uploads, plugin-capable Codex environments, and an MCP-backed ChatGPT custom app/plugin connection.
 
 ## Current public access
 
@@ -8,16 +8,18 @@ ExplainFlow is designed for public use across ChatGPT Skill uploads and plugin-c
 - License: MIT
 - ChatGPT Skill package: installable from the repository ZIP where Skill upload is supported
 - Codex plugin package: declared by `.codex-plugin/plugin.json` with bundled skills under `skills/`
+- MCP runtime implementation: available under `mcp-server/`, ready for deployment/testing
+- Public Plugin Directory listing: not active until OpenAI review/publication is completed
 
 ## ChatGPT Skills
 
 Users can download the repository ZIP and upload it from the ChatGPT Skills interface where Skill upload is available. The canonical Skill entry point is the root `SKILL.md`.
 
-OpenAI currently documents direct Skill sharing primarily for workspace sharing. A globally searchable Plugin Directory listing is a separate distribution path from uploading or sharing an individual Skill.
+A globally searchable Plugin Directory listing is a separate distribution path from uploading or sharing an individual Skill.
 
 ## Plugin package
 
-The repository now contains:
+The repository contains:
 
 ```text
 .codex-plugin/plugin.json
@@ -27,22 +29,41 @@ PRIVACY.md
 TERMS.md
 ```
 
-This follows OpenAI's current plugin packaging model, where the plugin manifest lives at `.codex-plugin/plugin.json` and skill content is exposed through the `skills/` directory.
+## MCP-backed custom app/plugin
+
+The repository also contains a stateless MCP implementation in `mcp-server/`.
+
+The server exposes:
+
+- `explainflow_explain`
+- `explainflow_recommend_format`
+- `explainflow_list_formats`
+
+It is designed for Cloudflare Workers using the current Model Context Protocol TypeScript server SDK and a web-standard Streamable HTTP endpoint.
+
+After deployment, the primary connection URL is expected to be:
+
+```text
+https://<worker-host>/mcp
+```
+
+The initial design uses no authentication, no user accounts, no database, and no external model API key. The MCP server returns ExplainFlow routing/rendering contracts that the connected assistant uses to generate the final explanation.
 
 ## Public Plugin Directory
 
-OpenAI's Plugin Directory can contain plugins made only of skills as well as plugins that include apps. Inclusion in the public directory is controlled by OpenAI's submission/curation process and is separate from making the GitHub repository public.
+Making the GitHub repository public does not automatically create a globally searchable ChatGPT Plugin Directory listing. Directory inclusion remains a separate OpenAI review/publication step.
 
-ExplainFlow is therefore ready at the package level for public-directory review, but a directory listing is not active until OpenAI accepts and publishes it.
+The app/plugin path is therefore:
 
-## Release checklist before directory submission
-
-1. Complete the behavioral evaluation suite.
-2. Resolve blocker and high-severity failures.
-3. Add real output examples/screenshots.
-4. Validate plugin metadata and Skill loading.
-5. Keep `PRIVACY.md` and `TERMS.md` publicly accessible.
-6. Submit through the currently available OpenAI plugin/app publication route when eligible.
+1. Deploy the MCP runtime.
+2. Add the deployed `/mcp` URL as a custom ChatGPT plugin/app.
+3. Confirm all tools are discovered and usable.
+4. Run the smoke tests and the 45-case behavioral suite.
+5. Add representative real outputs/screenshots.
+6. Resolve blocker/high-severity failures.
+7. Verify public privacy and terms links.
+8. Submit through the OpenAI-supported review/publication route available to the account.
+9. After approval, verify that ExplainFlow is searchable and installable from an unrelated account.
 
 ## Fallback public distribution
 
