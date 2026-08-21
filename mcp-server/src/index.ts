@@ -7,7 +7,7 @@ import {
   type ExplainFlowFormat
 } from "./formats";
 
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 const FORMAT_ENUM = z.enum(EXPLAINFLOW_FORMATS);
 const DEPTH_ENUM = z.enum(["concise", "standard", "deep"]);
 
@@ -71,19 +71,19 @@ function buildServer() {
     { name: "explainflow", version: VERSION },
     {
       instructions:
-        "ExplainFlow is a read-only formatting and explanation-routing service. Use explainflow_explain when a user asks for a mind map, flowchart, diagram, architecture view, infographic, cheat sheet, workflow, timeline, comparison, quiz, structured teaching mode, or another supported ExplainFlow format. The tool returns a rendering contract; use that contract to produce the final answer."
+        "ExplainFlow is a read-only explanation-routing service. Routing policy is mandatory: if the user explicitly requests a supported slash command or clearly names a specific ExplainFlow format such as summary, architecture, mind map, flowchart, diagram, infographic, cheat sheet, timeline, workflow, comparison, quiz, or another supported format, call explainflow_explain with that exact format. If the user invokes ExplainFlow but does NOT specify a format, call explainflow_auto so ExplainFlow selects the best format automatically and returns the rendering contract. Do not run the behavioral evaluation suite during normal user requests; the 45 eval cases are QA only. Use the returned contract to produce the final user-facing answer."
     }
   );
 
   server.registerTool(
     "explainflow_explain",
     {
-      title: "Explain with ExplainFlow",
+      title: "Explain with a chosen ExplainFlow format",
       description:
-        "Route a topic into one of ExplainFlow's 30 structured explanation formats and return the exact rendering contract the assistant should follow for the final answer.",
+        "Use when the user explicitly selects one of ExplainFlow's 30 formats. Route the topic into that exact format and return the rendering contract for the final answer.",
       inputSchema: z.object({
         topic: z.string().min(1).max(12000).describe("The topic or question to explain."),
-        format: FORMAT_ENUM.describe("The ExplainFlow format to use."),
+        format: FORMAT_ENUM.describe("The ExplainFlow format explicitly requested by the user."),
         audience: z
           .string()
           .min(1)
@@ -131,11 +131,78 @@ function buildServer() {
   );
 
   server.registerTool(
+    "explainflow_auto",
+    {
+      title: "Auto-route with ExplainFlow",
+      description:
+        "Use whenever the user invokes ExplainFlow without specifying a format. Automatically choose the best ExplainFlow format from the user's topic and goal, then return the complete rendering contract for the final answer.",
+      inputSchema: z.object({
+        topic: z.string().min(1).max(12000).describe("The topic or question to explain."),
+        goal: z
+          .string()
+          .min(1)
+          .max(1000)
+          .optional()
+          .describe("Optional description of what the user wants to understand, create, compare, revise, or learn."),
+        audience: z
+          .string()
+          .min(1)
+          .max(200)
+          .optional()
+          .describe("Optional audience, such as beginner, student, developer, or executive."),
+        depth: DEPTH_ENUM
+          .optional()
+          .default("standard")
+          .describe("Requested level of detail."),
+        source: z
+          .string()
+          .max(50000)
+          .optional()
+          .describe("Optional user-provided source text that must be treated as the primary basis for the explanation.")
+      }),
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false
+      }
+    },
+    async ({ topic, goal, audience, depth, source }) => {
+      const routingText = `${goal ?? ""} ${topic}`.trim();
+      const format = recommendFormat(routingText);
+      const contract = buildRenderingContract({
+        topic,
+        format,
+        audience,
+        depth,
+        source,
+        goal
+      });
+
+      const result = {
+        autoRouted: true,
+        recommendedFormat: format,
+        ...contract
+      };
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `ExplainFlow automatically selected /${format}.\n\n${contractAsText(contract)}`
+          }
+        ],
+        structuredContent: result
+      };
+    }
+  );
+
+  server.registerTool(
     "explainflow_recommend_format",
     {
       title: "Recommend an ExplainFlow format",
       description:
-        "Choose the best ExplainFlow format for a user's stated goal when they have not selected a slash command themselves.",
+        "Return only a format recommendation for planning or inspection. For a normal user request with no chosen format, prefer explainflow_auto so routing and the rendering contract happen in one call.",
       inputSchema: z.object({
         goal: z.string().min(1).max(1000).describe("What the user wants to understand, create, compare, revise, or learn."),
         topic: z.string().min(1).max(500).optional().describe("Optional topic for context.")
@@ -237,8 +304,10 @@ export default {
           status: "ok",
           version: VERSION,
           mcpEndpoint: "/mcp",
+          routingPolicy: "explicit-format -> explainflow_explain; unspecified-format -> explainflow_auto",
           tools: [
             "explainflow_explain",
+            "explainflow_auto",
             "explainflow_recommend_format",
             "explainflow_list_formats"
           ]
