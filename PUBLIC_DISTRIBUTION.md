@@ -1,70 +1,57 @@
 # ExplainFlow Public Distribution
 
-ExplainFlow is designed for public use across ChatGPT Skill uploads, plugin-capable Codex environments, and an MCP-backed ChatGPT custom app/plugin connection.
+ExplainFlow is designed for public use across ChatGPT Skill uploads, plugin-capable environments, and its public MCP runtime.
 
 ## Current public access
 
 - Source repository: public on GitHub
 - License: MIT
 - ChatGPT Skill package: installable from the repository ZIP where Skill upload is supported
-- Codex plugin package: declared by `.codex-plugin/plugin.json` with bundled skills under `skills/`
-- MCP runtime implementation: available under `mcp-server/`, ready for deployment/testing
-- Public Plugin Directory listing: not active until OpenAI review/publication is completed
+- Plugin package: declared by `.codex-plugin/plugin.json` with bundled skills under `skills/`
+- Public MCP runtime: `https://explainflow-mcp.aneruth-medloop.workers.dev/mcp`
+- Authentication: none; runtime is read-only and stateless
+
+## Runtime behavior
+
+When the user explicitly names a supported format, ExplainFlow uses that format.
+
+When the user invokes ExplainFlow without naming a format, the MCP runtime uses `explainflow_auto` to choose the most suitable ExplainFlow format automatically.
+
+The 45 behavioral evaluation cases are a release QA suite only; they are not executed during ordinary user requests.
 
 ## ChatGPT Skills
 
 Users can download the repository ZIP and upload it from the ChatGPT Skills interface where Skill upload is available. The canonical Skill entry point is the root `SKILL.md`.
 
-A globally searchable Plugin Directory listing is a separate distribution path from uploading or sharing an individual Skill.
+## MCP app
 
-## Plugin package
-
-The repository contains:
+The public MCP endpoint can be connected as a custom ChatGPT app/plugin:
 
 ```text
-.codex-plugin/plugin.json
-skills/explainflow/SKILL.md
-skills/explainflow/references/
-PRIVACY.md
-TERMS.md
+https://explainflow-mcp.aneruth-medloop.workers.dev/mcp
 ```
 
-## MCP-backed custom app/plugin
-
-The repository also contains a stateless MCP implementation in `mcp-server/`.
-
-The server exposes:
+The deployed runtime exposes four read-only tools:
 
 - `explainflow_explain`
+- `explainflow_auto`
 - `explainflow_recommend_format`
 - `explainflow_list_formats`
 
-It is designed for Cloudflare Workers using the current Model Context Protocol TypeScript server SDK and a web-standard Streamable HTTP endpoint.
+## Plugin Directory
 
-After deployment, the primary connection URL is expected to be:
+A public GitHub repository or a custom MCP app does not automatically become a globally searchable Plugin Directory listing. OpenAI accepts app submissions for review; approved apps may be distributed through plugin listings in the Plugins Directory.
 
-```text
-https://<worker-host>/mcp
-```
+ExplainFlow is technically prepared for that submission path. Final global availability depends on OpenAI review and approval, and on the user's plan, workspace, role, supported surface, and region.
 
-The initial design uses no authentication, no user accounts, no database, and no external model API key. The MCP server returns ExplainFlow routing/rendering contracts that the connected assistant uses to generate the final explanation.
+## Submission checklist
 
-## Public Plugin Directory
-
-Making the GitHub repository public does not automatically create a globally searchable ChatGPT Plugin Directory listing. Directory inclusion remains a separate OpenAI review/publication step.
-
-The app/plugin path is therefore:
-
-1. Deploy the MCP runtime.
-2. Add the deployed `/mcp` URL as a custom ChatGPT plugin/app.
-3. Confirm all tools are discovered and usable.
-4. Run the smoke tests and the 45-case behavioral suite.
-5. Add representative real outputs/screenshots.
-6. Resolve blocker/high-severity failures.
-7. Verify public privacy and terms links.
-8. Submit through the OpenAI-supported review/publication route available to the account.
-9. After approval, verify that ExplainFlow is searchable and installable from an unrelated account.
-
-## Fallback public distribution
-
-Until a public directory listing is approved, anyone can still use ExplainFlow by downloading the public repository ZIP and uploading it as a Skill in supported ChatGPT environments, or by installing the repository as a plugin in a compatible Codex setup.
+1. Deploy the latest MCP runtime revision.
+2. Verify the four MCP tools are discovered in ChatGPT.
+3. Verify explicit-format and automatic routing.
+4. Run the 45-case behavioral QA suite.
+5. Add representative real output screenshots/examples.
+6. Verify `PRIVACY.md`, `TERMS.md`, app name, description, icon, and public endpoint.
+7. Submit the app through OpenAI's app publication flow.
+8. Track review feedback and resolve any requested changes.
+9. After approval, verify ExplainFlow is searchable in the Plugin Directory from an unrelated eligible account.
